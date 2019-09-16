@@ -1,39 +1,147 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
-      #messages { margin-bottom: 40px }
-    </style>
-  </head>
-  <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-      $(function () {
-        var socket = io();
-        $('form').submit(function(){
-          socket.emit('chat message', $('#m').val());
-          $('#m').val('');
-          return false;
-        });
-        socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
-          window.scrollTo(0, document.body.scrollHeight);
-        });
+
+<head>
+  <title>Socket.IO chat</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
+
+  <style>
+    #username{
+     border: none;
+     margin-top: 120px;
+    
+     
+   }
+   .card{
+     height: 500px;
+     background-color:grey;
+   }
+   .card-footer{
+    background-color:grey;
+    display:none;
+   }
+   /* #messages{
+    position: fixed; 
+    bottom: 10px; 
+   } */
+
+  
+   .btn{
+    margin-top: -15px;
+    position: relative;;
+    margin-left: 295px;
+
+   }
+   #users{
+     list-style-type: none;
+   }
+   .messages{
+     list-style-type: none;
+    
+   }
+   .messages input{
+    background-color: #72A4D2;
+    margin-bottom: 50px;
+   }
+  
+
+
+  </style>
+</head>
+
+<body>
+  <br>
+  <div class="container-fluid col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <div id="home">
+          <form action="#" id="userForm">
+            <input type="text" class="form-control text-center" placeholder="Username" id="username">
+          </form>
+        </div>
+        <div>
+
+        </div>
+        <div id="main" style="display:none;">
+         <div class="text-center">
+            <ul id="users"></ul>
+         </div>
+         <div >
+            <div class="messages" >
+
+            </div>
+           <div class="other_messages">
+
+           </div>
+         </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer" >
+        <form action="#" id="messageForm">
+            <input type="text" class="form-control" placeholder="Type message" id="message">
+          </form>
+    </div>
+
+  </div>
+
+
+
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+
+    $(function () {
+      var socket = io();
+      var username;
+      var user;
+
+      $("#userForm").submit(function (event) {
+        event.preventDefault();
+        $("#home").hide();
+        $("#main").show();
+        $(".card-footer").show();
+        socket.emit('user', $('#username').val());
+        username =  $('#username').val();
+        
       });
-    </script>
-  </body>
+
+      $('#messageForm').submit(function (event) {
+        event.preventDefault();
+        socket.emit('chat message', $('#message').val());
+        $('#message').val('');
+        return false;
+      });
+      socket.on('chat message', function (msg) {
+         user = msg.split(":")
+        console.log(msg.split(":"));
+        console.log( username == user[0]);
+        if(username == user[0]){
+           $('.messages').append($('<input readonly style="float: left;background-color: green; "><br>').val(msg));
+        window.scrollTo(0, document.body.scrollHeight);
+        }else{
+          $('.messages').append($('<input style="float: right;background-color: #72A4D2; " readonly>').val(msg));
+        window.scrollTo(0, document.body.scrollHeight);
+        }
+       
+      });
+
+      socket.on('user', function (info) {
+         $('#users').append($('<li>').text(info));
+      });
+
+      // function typing(){
+
+      //   $('#m').keydown(function(key){
+      //     if(key.keyCode != 13){
+
+      //     }
+      //   });
+
+
+    });
+  </script>
+</body>
+
 </html>
